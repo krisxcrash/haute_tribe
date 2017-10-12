@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Your Haute Tribe Styles</title>
+  <!-- Latest compiled and minified CSS & JS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/yeti/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  
+</head>
+
+<style>
+body { 
+        padding-top:80px; 
+        word-wrap:break-word; }
+#map {
+        height: 60%;
+        width: 40%;
+    }
+
+* {
+    text-align: center;
+}
+
+.jumbo-ttl {
+    text-align: left;
+    text-shadow: 2px 2px 4px #fff;
+}
+
+.jumbo-format {
+    background: url("http://i2.cdn.cnn.com/cnnnext/dam/assets/160904110859-06-white-after-labor-day.jpg") no-repeat;
+    background-position: center;
+    background-size: 100%;
+    padding: 200px;
+}
+
+.btn-fmt {
+    background: #ccc !important;
+}
+   
+
+</style>
+
+<body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>                        
+                    </button>
+                    <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span></a>
+                  </div>
+                  <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-right">
+                      <li><a href="/">ABOUT US</a></li>
+                      <li><a href="/logout">LOG OUT</a></li>
+
+                     
+                      <li><a href="#"></a></li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+    <div class="container-fluid">
+        <div class="jumbotron jumbo-format"> 
+            <h1 class="jumbo-ttl"><span class="fa fa-anchor"></span> Check the weather & find your style!</h1>
+        </div>
+    </div>
+
+    <div class="container">
+<!-- 
+            <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+            <br /><br /> -->
+            <div id="floating-panel">
+                <div class="col-md-12 text-center">
+                    <label for="weather">See the weather:</label>
+                    <input id="address" type="textbox" value="Enter City"  onfocus="if(this.value == 'Enter City') { this.value = ''; }">
+                    <input id="submit" type="button" value="Search">
+                </div>
+                <div id="error"></div>
+                <div id="show"></div>
+                <div id="map" style="display:none;"></div>
+        </div> 
+    </div>
+</div>
+    
+    <div class="text-center">
+        <br/>
+      <button class="btn-default btn-fmt" id="thunderstorm">thunderstorm</button>
+      <button class="btn-default btn-fmt" id="rain">rain</button>
+      <button class="btn-default btn-fmt" id="drizzle">drizzle</button>
+      <button class="btn-default btn-fmt" id="clear">clear skies</button>
+      <button class="btn-default btn-fmt" id="clouds">cloudy</button>
+      <button class="btn-default btn-fmt" id="snow">snow</button>
+      <button class="btn-default btn-fmt" id="humid">humid</button>
+    </div>
+    <br /><br />
+    <div class="container-fluid" id="stylist-options">
+        <div class="row style-results-tops">
+
+        </div>
+  </div>
+
+  <script>
+      //Google Maps submit 
+function initMap() {
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 8,
+        center: { lat: 33.669, lng: -117.823 }
+    });
+    var geocoder = new google.maps.Geocoder();
+
+    document.getElementById('submit').addEventListener('click', function() {
+        geocodeAddress(geocoder, map);
+    });
+
+    //Google AutoComplete
+    var options = {
+        types: ['(cities)'],
+    };
+
+    var input = document.getElementById('address');
+    var autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    //OpenWeatherMap Request
+    $(document).ready(function() {
+
+        $('#submit').click(function() {
+
+            var city = $("#address").val();
+
+            if (city != '') {
+                $.ajax({
+
+                    url: 'https://api.openweathermap.org/data/2.5/weather?q=' + city + "&units=imperial" + "&APPID=f46e494a36105a4717feab8bd6201b69",
+                    type: "GET",
+                    dataType: "jsonp",
+                    success: function(data) {
+                        console.log(data);
+                        var weatherData = show(data);
+
+                        $("#show").html(weatherData);
+                    }
+                });
+            } else {
+                $("#error").html("Please insert city");
+            }
+        });
+    });
+}
+//Gets value from address value and pins marker on Google maps
+function geocodeAddress(geocoder, resultsMap) {
+    var address = document.getElementById('address').value;
+    geocoder.geocode({ 'address': address }, function(results, status) {
+        if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+                map: resultsMap,
+                position: results[0].geometry.location
+            });
+        } else {
+            $("#error").html("<div class='alert alert-danger text-center' style='font-weight:20px'>Please insert city!</div>");
+        }
+    });
+}
+//Display OpenWeather Map Data
+function show(data) {
+    return "<h2>Current Weather for " + data.name + "," + data.sys.country + "</h2>" +
+        "<h3><strong>Weather</strong>: <img src='http://openweathermap.org/img/w/" + data.weather[0].icon + ".png'>" + data.weather[0].main + "</h3>" +
+        "<h3><strong>Temperature</strong>: " + data.main.temp + " °F</h3>" +
+        "<h3><strong>Humidity</strong>: " + data.main.humidity + " %</h3>" +
+        "<h3><strong>Wind Speed</strong>: " + data.wind.speed + " MPH</h3>";
+}
+
+  //thunderstorm, rain, snow, drizzle, clear, clouds, atmosphere, extreme, additional
+
+    var tops = ["jackets", "sweaters", "womens-tops"];
+    var bottoms = ["leggings", "jeans", "shorts", "skirts"];
+    var apiKey = "uid0-39925400-33";
+
+
+    $("#clouds").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "womens-tops";
+    var category2 = "leggings";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4></div></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4></a>"
+                
+                + "</p></div></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+
+
+    $("#humid").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "womens-tops";
+    var category2 = "shorts";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+    $("#snow").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "jackets";
+    var category2 = "leggings";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+
+
+    $("#clear").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "womens-tops";
+    var category2 = "skirts";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+  $("#thunderstorm").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "jackets";
+    var category2 = "jeans";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+
+
+    $("#drizzle").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "jackets";
+    var category2 = "jeans";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+
+
+$("#rain").on("click", function() {
+    // In this case, the "this" keyword refers to the button that was clicked
+    var category = "jackets";
+    var category2 = "jeans";
+
+    // Constructing a URL to search Giphy for the name of the person who said the quote
+    
+    var queryURL = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category;
+    var queryURL2 = "https://cors-anywhere.herokuapp.com/http://api.shopstyle.com/api/v2/products/?pid="+ apiKey + "&cat=" + category2;
+
+    // Performing our AJAX GET request
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+            
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL)
+          
+        }
+      });
+
+      $.ajax({
+        url: queryURL2,
+        method: "GET"
+      })
+      // After the data comes back from the API
+      .done(function(response) {
+        // Storing an array of results in the results variable
+        var results = response.products;
+
+        // Looping over every result item
+        for (var i = 0; i < results.length; i++) {
+
+            var styleDiv = $("<div class='styles'>");
+
+            var styleResults = "<div class='col-md-2 style-image'><a href='" 
+                + results[i].clickUrl
+                + "'><img class='thumbnail' src='" 
+                + results[i].image.sizes.Best.url
+                + "' height='350'><h3 class='style-h3'>" 
+                + results[i].brandedName
+                + "</h3><h3 class='style-h3'>"
+                + results[i].priceLabel
+                + "</h3><h4 class='style-h4'>"
+                + results[i].retailer.name
+                + "</h4><p class='style-p'></a>"
+                + results[i].description
+                + "</p></div>";
+
+                styleDiv.prepend(styleResults);
+                $(".style-results-tops").prepend(styleDiv);    
+                    
+            console.log("BRAND: " + results[i].brandedName + "\n");
+            console.log("PRICE: " + results[i].priceLabel + "\n");
+            console.log("RETAILER: " + results[i].retailer.name + "\n");
+            console.log("DESCRIPTION: " + results[i].description + "\n");
+            console.log("IMAGE: " + results[i].image.sizes.Best.url + "\n");
+
+            console.log("\n\n" + queryURL2)
+          
+        }
+      });
+
+  });
+
+  
+  </script>
+ <!-- Google Maps -->
+ <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDR1tfuOafq7CdDzndG4p5VmaBFoZnkPZw&libraries=places&callback=initMap">
+ </script>
+</body>
+
+</html>

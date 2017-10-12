@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WEATHER API TEST</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <style>
+    /* Google Maps CSS. Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+        height: 60%;
+        width: 40%;
+    }
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+</head>
+
+<body onload="initMap()">
+    <div class="jumbotron">
+        <h2 class="text-center">Current Weather</h2>
+    </div>
+    <div id="floating-panel">
+        <input id="address" type="textbox" value="Enter City">
+        <input id="submit" type="button" value="City">
+    </div>
+    <div id="error"></div>
+    <div id="show"></div>
+    <div id="map"></div>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Google Maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDR1tfuOafq7CdDzndG4p5VmaBFoZnkPZw&libraries=places&callback=initMap">
+    </script>
+    <script type="text/javascript" src="js/weather.js"></script>
+</body>
+
+</html>

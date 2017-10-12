@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <style>
+        body         { padding-top:80px; }
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="col-sm-6 col-sm-offset-3">
+
+    <h1><span class="fa fa-sign-in"></span> Signup</h1>
+
+    <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+
+    <!-- LOGIN FORM -->
+    <form action="/signup" method="post">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" name="email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+
+        <div class="row setup-content" id="step-2">
+                <div class="col-xs-12">
+                    <div class="col-md-12">
+                        <div class="form-group user-select">
+                            <h5>Question 1</h5>
+                            <label for="q1">Bold, open-minded, enjoys life to the fullest</label>
+                                <select class="form-control questions" id="q1">
+                                  <option value = "">Select an Option</option>
+                                  <option value = "1">1 (Strongly Disagree)</option>
+                                  <option value = "2">2 (Disagree)</option>
+                                  <option value = "3">3 (Neutral)</option>
+                                  <option value = "4">4 (Agree)</option>
+                                  <option value = "5">5 (Strongly Agree)</option>
+                                </select>
+                        </div>
+                        <div class="form-group user-select">
+                            <h5>Question 2</h5>
+                            <label for="q2">You live in jeans, shorts, plain t-shirts and confortable shoes</label>
+                                <select class="form-control questions" id="q2">
+                                  <option value = "">Select an Option</option>
+                                  <option value = "1">1 (Strongly Disagree)</option>
+                                  <option value = "2">2 (Disagree)</option>
+                                  <option value = "3">3 (Neutral)</option>
+                                  <option value = "4">4 (Agree)</option>
+                                  <option value = "5">5 (Strongly Agree)</option>
+                                </select>
+                        </div>
+                        <div class="form-group user-select">
+                            <h5>Question 3</h5>
+                            <label for="q3">Urban Outfitters, Free People and Anthropologie is your jam</label>
+                                <select class="form-control questions" id="q3">
+                                  <option value = "">Select an Option</option>
+                                  <option value = "1">1 (Strongly Disagree)</option>
+                                  <option value = "2">2 (Disagree)</option>
+                                  <option value = "3">3 (Neutral)</option>
+                                  <option value = "4">4 (Agree)</option>
+                                  <option value = "5">5 (Strongly Agree)</option>
+                                </select>
+                        </div>
+                        <div class="form-group user-select">
+                            <h5>Question 4</h5>
+                            <label for="q4">You are preppy, but with a modern edge. Other then the odd stripe, you prefer solid colors</label>
+                                <select class="form-control questions" id="q4">
+                                  <option value = "">Select an Option</option>
+                                  <option value = "1">1 (Strongly Disagree)</option>
+                                  <option value = "2">2 (Disagree)</option>
+                                  <option value = "3">3 (Neutral)</option>
+                                  <option value = "4">4 (Agree)</option>
+                                  <option value = "5">5 (Strongly Agree)</option>
+                                </select>
+                        </div>
+                        <div class="form-group user-select">
+                            <h5>Question 5</h5>
+                            <label for="q5">You are fearless when it comes to mixing colors, fabrics, textures and prints</label>
+                                <select class="form-control questions" id="q5">
+                                  <option value = "">Select an Option</option>
+                                  <option value = "1">1 (Strongly Disagree)</option>
+                                  <option value = "2">2 (Disagree)</option>
+                                  <option value = "3">3 (Neutral)</option>
+                                  <option value = "4">4 (Agree)</option>
+                                  <option value = "5">5 (Strongly Agree)</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <button type="submit" class="btn btn-warning btn-lg">Signup</button>
+    </form>
+
+    <hr>
+
+    <p>Already have an account? <a href="/login">Login</a></p>
+    <p>Or go <a href="/">home</a>.</p>
+
+
+</div>
+</div>
+</body>
+</html>

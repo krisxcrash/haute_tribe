@@ -1,1 +1,2 @@
-# haute_tribe
+# GroupProject2
+Group Project 2
